@@ -1,0 +1,57 @@
+1. The most expensive listing is listing 24650875 at a price of $10,000. The listing is for a full victorian house with 7,500 square feet, four floors, and a hot tub. The listing is in the Western Addition neighborhood. 
+
+SELECT
+	sfo_listings.price,
+	sfo_listings.id,
+	sfo_listings.name,
+	sfo_listings.room_type,
+	sfo_listings.neighbourhood,
+FROM
+	sfo_listings
+ORDER by price DESC
+
+2. The top three most popular neighborhoods, in regards to the most number of bookings and the most reviews, are Parkside, Oceanview, and Mission.
+
+WITH
+	popular
+AS
+(
+	SELECT
+		sfo_calendar.listing_id,
+		COUNT(sfo_calendar.listing_id) as booked_count
+	FROM
+		sfo_calendar
+	WHERE
+		sfo_calendar.available = 'f'
+	GROUP BY sfo_calendar.listing_id
+	ORDER BY booked_count DESC
+)
+
+SELECT
+	sfo_listings.neighbourhood,
+	sfo_listings.number_of_reviews,
+	popular.booked_count
+FROM
+	sfo_listings
+JOIN
+	popular
+ON
+	sfo_listings.id = popular.listing_id
+GROUP BY sfo_listings.number_of_reviews, sfo_listings.neighbourhood, popular.booked_count
+ORDER BY popular.booked_count DESC, sfo_listings.number_of_reviews DESC
+
+
+3a. The cheapest time of year to go to San Francisco is September. 
+SELECT
+	MIN(price) minprice,
+	calender_date
+FROM
+	sfo_calendar
+GROUP by calender_date
+
+3b. The busiest time of year to go to San Francisco is the beginning of December.
+FROM
+sfo_calendar
+where available = 't'
+GROUP BY calender_date
+ORDER BY count DESC
